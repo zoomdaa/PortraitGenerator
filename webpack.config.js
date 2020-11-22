@@ -15,6 +15,7 @@ module.exports = (env) => {
       path: path.resolve(__dirname, "dist"),
       filename: "[name].[contenthash:8].js",
       chunkFilename: "[name].[contenthash:8].js",
+      publicPath: "/"
     },
     target: isDevEnv ? "web" : "browserslist",
     devtool: isDevEnv ? "inline-source-map" : false,
