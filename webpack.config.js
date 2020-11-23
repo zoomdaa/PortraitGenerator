@@ -6,7 +6,7 @@ const htmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
 module.exports = (env) => {
-  const isDevEnv = env.NODE_ENV === "development"
+  const isDevEnv = env.NODE_ENV === "development";
   return {
     entry: {
       main: "./src/main.js",
@@ -15,7 +15,7 @@ module.exports = (env) => {
       path: path.resolve(__dirname, "dist"),
       filename: "[name].[contenthash:8].js",
       chunkFilename: "[name].[contenthash:8].js",
-      publicPath: "/"
+      publicPath: "/",
     },
     target: isDevEnv ? "web" : "browserslist",
     devtool: isDevEnv ? "inline-source-map" : false,
@@ -44,7 +44,7 @@ module.exports = (env) => {
           test: /\.(png|jpe?g|gif|webm|mp4|svg)$/,
           loader: "file-loader",
           options: {
-            name: "[name][contenthash:8].[ext]",
+            name: "[name].[contenthash:8].[ext]",
             outputPath: "assets/img",
             esModule: false,
           },
@@ -82,6 +82,7 @@ module.exports = (env) => {
     resolve: {
       alias: {
         vue$: "vue/dist/vue.runtime.esm.js",
+        "@": path.resolve(__dirname, "src"),
       },
       extensions: ["*", ".js", ".vue", ".json"],
     },
