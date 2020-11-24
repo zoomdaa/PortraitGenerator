@@ -14,8 +14,15 @@
       </div>
     </div>
     <div class="pg-action">
-      <button class="btn btn-primary">上传图片</button>
-      <button class="btn btn-success">下载截图</button>
+      <input
+        type="file"
+        class="hiddenInput"
+        accept="image/*"
+        @change="handleFiles"
+        ref="uploadElem"
+      />
+      <button class="btn btn-primary" @click="uploadOnClick">上传图片</button>
+      <button class="btn btn-success" @click="downloadOnClick">下载截图</button>
     </div>
     <div class="pg-overlay-imgs-selector">
       <div class="container">
@@ -36,6 +43,7 @@
 import portrait_1 from "@/assets/portraits/queen_hearts.png";
 import portrait_2 from "@/assets/portraits/uncle-sam-wants-you.png";
 import portrait_3 from "@/assets/portraits/usa-new-york.png";
+import Toast from "@/libs/Toast.js";
 export default {
   data() {
     return {
@@ -70,6 +78,17 @@ export default {
         this.currentImgSrc = matched.src;
       }
     },
+    handleFiles(e) {
+      console.log(e)
+    },
+    uploadOnClick() {
+      this.$refs.uploadElem.click()
+    },
+    downloadOnClick() {
+      new Toast({
+        msg: "哈哈哈哈"
+      })
+    }
   },
 };
 </script>
@@ -106,7 +125,7 @@ export default {
     }
   }
   .pg-action {
-    z-index: 999;
+    z-index: 888;
     position: fixed;
     bottom: 130px;
     width: 100%;
@@ -126,7 +145,7 @@ export default {
       box-sizing: border-box;
       outline: none;
       margin: 0;
-      transition: .1s;
+      transition: 0.1s;
       font-weight: 500;
       -moz-user-select: none;
       -webkit-user-select: none;
@@ -144,6 +163,9 @@ export default {
         background-color: #67c23a;
         border-color: #67c23a;
       }
+    }
+    .hiddenInput {
+      display: none;
     }
   }
   .pg-overlay-imgs-selector {
