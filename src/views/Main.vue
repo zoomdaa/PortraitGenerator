@@ -44,6 +44,7 @@ import portrait_1 from "@/assets/portraits/queen_hearts.png";
 import portrait_2 from "@/assets/portraits/uncle-sam-wants-you.png";
 import portrait_3 from "@/assets/portraits/usa-new-york.png";
 import Toast from "@/libs/Toast.js";
+import ReadFileAsImg from "@/utils/readFileAsImg.js";
 export default {
   data() {
     return {
@@ -65,9 +66,7 @@ export default {
       currentImgSrc: portrait_1,
     };
   },
-  created() {
-    console.log(this.portraits);
-  },
+  created() {},
   methods: {
     toggleImg(item) {
       if (this.currentActiveId !== item.id) {
@@ -79,16 +78,22 @@ export default {
       }
     },
     handleFiles(e) {
-      console.log(e)
+      const file = e.target.files[0];
+      if (!file.type.startsWith("image/")) {
+        return new Toast({ msg: "请上传图片" });
+      }
+      ReadFileAsImg(file).then((dataUrl) => {
+        console.log(dataUrl);
+      });
     },
     uploadOnClick() {
-      this.$refs.uploadElem.click()
+      this.$refs.uploadElem.click();
     },
     downloadOnClick() {
       new Toast({
-        msg: "哈哈哈哈"
-      })
-    }
+        msg: "哈哈哈哈",
+      });
+    },
   },
 };
 </script>

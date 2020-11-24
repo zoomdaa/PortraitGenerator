@@ -26,7 +26,7 @@ export default class Toast {
     wrapper.style.borderRadius = "5px";
     wrapper.style.padding = "5px 15px";
     wrapper.style.color = "#fff";
-    wrapper.style.transition = "all ease-in-out .3s";
+    wrapper.style.transition = "translate3d ease-in-out .3s";
     wrapper.style.fontSize = "14px";
     wrapper.style.zIndex = "9999";
 
@@ -46,8 +46,8 @@ export default class Toast {
   }
   removeToast(toastEl) {
     toastEl.style.transform = "translate3d(-50%, -50%, 0) scale(0)";
-    setTimeout(() => {
-      this.bodyEl.removeChild(toastEl);
-    }, 301);
+    toastEl.addEventListener("transitionend", () => {
+        this.bodyEl.removeChild(toastEl);
+    }, true)
   }
 }
