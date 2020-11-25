@@ -38,7 +38,6 @@
     "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
-    "core-js": "^3.7.0",
     "dom-to-image": "^2.6.0",
     "vue": "^2.6.12",
     "vue-router": "^3.4.9"

@@ -1,16 +1,23 @@
 <template>
   <div class="main">
     <div class="pg-panel">
-      <div class="pg-canvas" id="pg-canvas">
-        <img class="pg-transformable-img" />
-        <div class="pg-transformable-control">
+      <div
+        class="pg-canvas"
+        id="pg-canvas"
+        :style="{ width: pgCanvas.width, height: pgCanvas.height }"
+      >
+        <img class="pg-transformable-img" :src="userImg" />
+        <div
+          class="pg-transformable-control"
+          :style="{ width: pgControl.width, height: pgControl.height }"
+        >
           <div class="pg-handle pg-handle-drag"></div>
           <div class="pg-handle pg-handle-scale-lt"></div>
           <div class="pg-handle pg-handle-scale-lb"></div>
           <div class="pg-handle pg-handle-scale-rt"></div>
           <div class="pg-handle pg-handle-scale-rb"></div>
         </div>
-        <img class="pg-overlay-img" :src="currentImgSrc" />
+        <img class="pg-overlay-img" ref="overlayImg" :src="currentImgSrc" />
       </div>
     </div>
     <div class="pg-action">
@@ -45,6 +52,7 @@ import portrait_2 from "@/assets/portraits/uncle-sam-wants-you.png";
 import portrait_3 from "@/assets/portraits/usa-new-york.png";
 import Toast from "@/libs/Toast.js";
 import ReadFileAsImg from "@/utils/readFileAsImg.js";
+
 export default {
   data() {
     return {
@@ -64,9 +72,23 @@ export default {
       ],
       currentActiveId: 1,
       currentImgSrc: portrait_1,
+      userImg: null,
+      pgCanvas: {
+        width: null,
+        height: null,
+      },
+      pgControl: {
+        width: "100px",
+        height: "100px",
+      },
     };
   },
   created() {},
+  watch: {
+    currentImgSrc() {
+      this.setCanvasSize();
+    },
+  },
   methods: {
     toggleImg(item) {
       if (this.currentActiveId !== item.id) {
@@ -83,7 +105,7 @@ export default {
         return new Toast({ msg: "请上传图片" });
       }
       ReadFileAsImg(file).then((dataUrl) => {
-        console.log(dataUrl);
+        this.userImg = dataUrl;
       });
     },
     uploadOnClick() {
@@ -94,6 +116,24 @@ export default {
         msg: "哈哈哈哈",
       });
     },
+    setCanvasSize() {
+      this.getImgSize(this.currentImgSrc).then(({ width, height }) => {
+        this.pgCanvas.width = width + "px";
+        this.pgCanvas.height = height + "px";
+      });
+    },
+    getImgSize(imgSrc) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.src = imgSrc;
+        img.onload = () => {
+          resolve({ width: img.width, height: img.height });
+        };
+      });
+    },
+  },
+  mounted() {
+    this.setCanvasSize();
   },
 };
 </script>
@@ -103,23 +143,76 @@ export default {
   height: 100%;
   width: 100%;
   background: url(../assets/bg.png);
-  padding-top: 40px;
+  overflow-y: auto;
+  &::-webkit-scrollbar {
+    display: none;
+  }
   .pg-panel {
     background-color: white;
     border-radius: 5px;
     box-shadow: 0px 0px 20px 0px #000;
     width: 90%;
-    margin: 0 auto;
-    max-height: 75vh;
-    overflow: auto;
+    margin: 40px auto 120px;
+    overflow-x: auto;
     .pg-canvas {
-      font-size: 0;
-      padding: 40px 20px;
-      text-align: center;
+      position: relative;
+      background-color: gray;
+      overflow: hidden;
+      margin: auto;
+      user-select: none;
       .pg-transformable-img {
-        z-index: 10;
+        width: 80px;
+        z-index: 99;
+        position: absolute;
+      }
+      .pg-transformable-control {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 888;
+        border: dashed 1px #fff;
+        cursor: move;
+        touch-action: none;
+        user-select: none;
+        -webkit-user-drag: none;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        .pg-handle {
+          position: absolute;
+          width: 20px;
+          height: 20px;
+        }
+        .pg-handle-drag {
+          top: 50%;
+          left: 50%;
+          background: url("../icons/drag.svg");
+          margin-left: -10px;
+          margin-top: -10px;
+        }
+        .pg-handle-scale-lt {
+          left: -3px;
+          top: -3px;
+          background: url("../icons/scale-lt.svg");
+        }
+        .pg-handle-scale-lb {
+          left: -3px;
+          bottom: -3px;
+          background: url("../icons/scale-lb.svg");
+        }
+        .pg-handle-scale-rt {
+          right: -3px;
+          top: -3px;
+          background: url("../icons/scale-rt.svg");
+        }
+        .pg-handle-scale-rb {
+          right: -3px;
+          bottom: -3px;
+          background: url("../icons/scale-rb.svg");
+        }
       }
       .pg-overlay-img {
+        position: absolute;
+        top: 0;
+        left: 0;
         width: 100%;
         object-fit: contain;
         z-index: 500;
@@ -130,7 +223,7 @@ export default {
     }
   }
   .pg-action {
-    z-index: 888;
+    z-index: 666;
     position: fixed;
     bottom: 130px;
     width: 100%;
@@ -183,6 +276,7 @@ export default {
     background-color: white;
     padding: 10px 0 10px 10px;
     box-shadow: 0px 0px 20px 0px #000;
+    z-index: 999;
     .container {
       display: inline-flex;
       .img-wrapper {
