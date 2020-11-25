@@ -10,6 +10,7 @@
         <div
           class="pg-transformable-control"
           :style="{ width: pgControl.width, height: pgControl.height }"
+          ref="controlMain"
         >
           <div class="pg-handle pg-handle-drag"></div>
           <div class="pg-handle pg-handle-scale-lt"></div>
@@ -52,6 +53,8 @@ import portrait_2 from "@/assets/portraits/uncle-sam-wants-you.png";
 import portrait_3 from "@/assets/portraits/usa-new-york.png";
 import Toast from "@/libs/Toast.js";
 import ReadFileAsImg from "@/utils/readFileAsImg.js";
+import { onPan } from "@/utils/hammer";
+import Hammer from "hammerjs";
 
 export default {
   data() {
@@ -131,9 +134,19 @@ export default {
         };
       });
     },
+    initControlEvent() {
+      const { controlMain } = this.$refs;
+      const hammer = new Hammer(controlMain);
+      hammer.on("pan", (ev) => {
+        // console.log(controlMain.style)
+        // controlMain.style.transform = `translate3d(${ev.deltaX}px, ${ev.deltaY}px, 0)`
+        console.log(ev)
+      });
+    },
   },
   mounted() {
     this.setCanvasSize();
+    this.initControlEvent();
   },
 };
 </script>
