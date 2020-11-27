@@ -10,13 +10,26 @@
         <div
           class="pg-transformable-control"
           :style="{ width: pgControl.width, height: pgControl.height }"
+          id="pg-handle-main"
           ref="controlMain"
         >
-          <div class="pg-handle pg-handle-drag"></div>
-          <div class="pg-handle pg-handle-scale-lt"></div>
-          <div class="pg-handle pg-handle-scale-lb"></div>
-          <div class="pg-handle pg-handle-scale-rt"></div>
-          <div class="pg-handle pg-handle-scale-rb"></div>
+          <div class="pg-handle pg-handle-drag" id="pg-handle-drag"></div>
+          <div
+            class="pg-handle pg-handle-scale-lt"
+            id="pg-handle-scale-lt"
+          ></div>
+          <div
+            class="pg-handle pg-handle-scale-lb"
+            id="pg-handle-scale-lb"
+          ></div>
+          <div
+            class="pg-handle pg-handle-scale-rt"
+            id="pg-handle-scale-rt"
+          ></div>
+          <div
+            class="pg-handle pg-handle-scale-rb"
+            id="pg-handle-scale-rb"
+          ></div>
         </div>
         <img class="pg-overlay-img" ref="overlayImg" :src="currentImgSrc" />
       </div>
@@ -141,14 +154,17 @@ export default {
     // 为图片控制区域初始化拖曳事件
     initControlPanEvent() {
       const { controlMain } = this.$refs;
+      const activeIds = ["pg-handle-main", "pg-handle-drag"];
       const panEvtHandler = new Hammer(controlMain);
       panEvtHandler.get("pan").set({ direction: Hammer.DIRECTION_ALL });
       // 监听拖动事件
       panEvtHandler.on("pan", (ev) => {
-        const { x, y } = this.controlPos;
-        controlMain.style.transform = `translate3d(${x + ev.deltaX}px, ${
-          y + ev.deltaY
-        }px, 0)`;
+        if (activeIds.includes(ev.target.id)) {
+          const { x, y } = this.controlPos;
+          controlMain.style.transform = `translate3d(${x + ev.deltaX}px, ${
+            y + ev.deltaY
+          }px, 0)`;
+        }
       });
       // 拖动结束后记录translate值
       panEvtHandler.on("panend", (ev) => {
@@ -165,10 +181,8 @@ export default {
       // 监听二指缩放
       pinchEvtHandler.on("pinch", (ev) => {
         if (ev.scale !== 1) {
-          const scale = ev.scale.toFixed(2) < 1 ? 0.99 : 1.09
-          const newWidth = parseInt(
-            parseInt(controlMain.style.width) * scale
-          );
+          const scale = ev.scale.toFixed(2) < 1 ? 0.99 : 1.09;
+          const newWidth = parseInt(parseInt(controlMain.style.width) * scale);
           const newHeight = parseInt(
             parseInt(controlMain.style.height) * scale
           );
@@ -178,11 +192,44 @@ export default {
         }
       });
     },
+    // 四个方向拖动放大图片
+    initControlDirPanEvent() {
+      const directionIds = [
+        "pg-handle-scale-lt",
+        "pg-handle-scale-lb",
+        "pg-handle-scale-rt",
+        "pg-handle-scale-rb",
+      ];
+      directionIds.forEach((id) => {
+        const el = document.querySelector(`#${id}`);
+        const direction = id.split("-")[3];
+        const panEvtHandler = new Hammer(el);
+        panEvtHandler.get("pan").set({ direction: Hammer.DIRECTION_ALL });
+        // 监听拖动事件
+        panEvtHandler.on("pan", (ev) => {
+          if (ev.target.id === id) {
+            this.scaleControl(direction, ev);
+          }
+        });
+      });
+    },
+    // 根据四个方向调整控制区域及用户图像的宽高
+    scaleControl(pos, ev) {
+      console.log(pos)
+      console.log(ev)
+      if (ev.angle > 30 && ev.angle < 60) {
+        const newX = ev.deltaX > 0 ? 1 : -1;
+        const newY = ev.deltaY > 0 ? 1 : -1;
+        this.pgControl.width = parseInt(this.pgControl.width) + newX + "px"
+        this.pgControl.height = parseInt(this.pgControl.height) + newY + "px"
+      }
+    },
   },
   mounted() {
     this.setCanvasSize();
     this.initControlPanEvent();
-    this.initControlPinchEvent();
+    // this.initControlPinchEvent();
+    this.initControlDirPanEvent();
   },
 };
 </script>
@@ -229,6 +276,7 @@ export default {
           position: absolute;
           width: 20px;
           height: 20px;
+          touch-action: pan-x pan-y;
         }
         .pg-handle-drag {
           top: 50%;
@@ -316,6 +364,7 @@ export default {
     }
   }
   .pg-overlay-imgs-selector {
+    user-select: none;
     position: fixed;
     bottom: 0;
     left: 0;
