@@ -107,6 +107,7 @@ module.exports = (env) => {
       historyApiFallback: true,
       hot: true,
       // open: true,
+      host: '0.0.0.0',
     },
   };
 };

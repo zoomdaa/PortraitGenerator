@@ -52,9 +52,9 @@ import portrait_1 from "@/assets/portraits/queen_hearts.png";
 import portrait_2 from "@/assets/portraits/uncle-sam-wants-you.png";
 import portrait_3 from "@/assets/portraits/usa-new-york.png";
 import Toast from "@/libs/Toast.js";
-import ReadFileAsImg from "@/utils/readFileAsImg.js";
-import { onPan } from "@/utils/hammer";
+import ReadFileAsImg from "@/utils/readFileAsImg";
 import Hammer from "hammerjs";
+import GetTransformInfo from "@/utils/getTransformInfo";
 
 export default {
   data() {
@@ -83,6 +83,10 @@ export default {
       pgControl: {
         width: "100px",
         height: "100px",
+      },
+      controlPos: {
+        x: 0,
+        y: 0,
       },
     };
   },
@@ -134,19 +138,51 @@ export default {
         };
       });
     },
-    initControlEvent() {
+    // 为图片控制区域初始化拖曳事件
+    initControlPanEvent() {
       const { controlMain } = this.$refs;
-      const hammer = new Hammer(controlMain);
-      hammer.on("pan", (ev) => {
-        // console.log(controlMain.style)
-        // controlMain.style.transform = `translate3d(${ev.deltaX}px, ${ev.deltaY}px, 0)`
-        console.log(ev)
+      const panEvtHandler = new Hammer(controlMain);
+      panEvtHandler.get("pan").set({ direction: Hammer.DIRECTION_ALL });
+      // 监听拖动事件
+      panEvtHandler.on("pan", (ev) => {
+        const { x, y } = this.controlPos;
+        controlMain.style.transform = `translate3d(${x + ev.deltaX}px, ${
+          y + ev.deltaY
+        }px, 0)`;
+      });
+      // 拖动结束后记录translate值
+      panEvtHandler.on("panend", (ev) => {
+        const { x, y } = GetTransformInfo(controlMain);
+        this.controlPos.x = x;
+        this.controlPos.y = y;
+      });
+    },
+    // 为图片控制区域初始化二指缩放事件
+    initControlPinchEvent() {
+      const { controlMain } = this.$refs;
+      const pinchEvtHandler = new Hammer(controlMain);
+      pinchEvtHandler.get("pinch").set({ enable: true });
+      // 监听二指缩放
+      pinchEvtHandler.on("pinch", (ev) => {
+        if (ev.scale !== 1) {
+          const scale = ev.scale.toFixed(2) < 1 ? 0.99 : 1.09
+          const newWidth = parseInt(
+            parseInt(controlMain.style.width) * scale
+          );
+          const newHeight = parseInt(
+            parseInt(controlMain.style.height) * scale
+          );
+          this.pgControl.width = newWidth + "px";
+          this.pgControl.height = newHeight + "px";
+          console.log(this.pgControl);
+        }
       });
     },
   },
   mounted() {
     this.setCanvasSize();
-    this.initControlEvent();
+    this.initControlPanEvent();
+    this.initControlPinchEvent();
   },
 };
 </script>
