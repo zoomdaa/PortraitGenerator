@@ -180,8 +180,8 @@ export default {
       pinchEvtHandler.get("pinch").set({ enable: true });
       // 监听二指缩放
       pinchEvtHandler.on("pinch", (ev) => {
-        if (ev.scale !== 1) {
-          const scale = ev.scale.toFixed(2) < 1 ? 0.99 : 1.09;
+        if (ev.target.id === "pg-handle-main" && ev.scale !== 1) {
+          const scale = ev.scale.toFixed(2) < 1 ? 0.99 : 1.02;
           const newWidth = parseInt(parseInt(controlMain.style.width) * scale);
           const newHeight = parseInt(
             parseInt(controlMain.style.height) * scale
@@ -215,20 +215,81 @@ export default {
     },
     // 根据四个方向调整控制区域及用户图像的宽高
     scaleControl(pos, ev) {
-      console.log(pos)
-      console.log(ev)
-      if (ev.angle > 30 && ev.angle < 60) {
-        const newX = ev.deltaX > 0 ? 1 : -1;
-        const newY = ev.deltaY > 0 ? 1 : -1;
-        this.pgControl.width = parseInt(this.pgControl.width) + newX + "px"
-        this.pgControl.height = parseInt(this.pgControl.height) + newY + "px"
+      // console.log(pos);
+      // console.log(ev);
+      const { controlMain } = this.$refs;
+      const { angle, deltaX, deltaY } = ev;
+      let threshold = 2;
+      switch (pos) {
+        case "lt":
+          const newX_lt = deltaX > 0 ? threshold : -threshold;
+          const newY_lt = deltaY > 0 ? threshold : -threshold;
+          if (angle > 20 && angle < 70) {
+            // 缩小
+            this.pgControl.width = parseInt(this.pgControl.width) - newX_lt + "px";
+            this.pgControl.height =
+              parseInt(this.pgControl.height) - newY_lt + "px";
+          } else if (angle > -160 && angle < -110) {
+            // 放大
+            this.pgControl.width = parseInt(this.pgControl.width) - newX_lt + "px";
+            this.pgControl.height =
+              parseInt(this.pgControl.height) - newY_lt + "px";
+          }
+          break;
+        case "lb":
+          const newX_lb = deltaX > 0 ? threshold : -threshold;
+          const newY_lb = deltaY > 0 ? threshold : -threshold;
+          if (angle > -70 && angle < -20) {
+            // 缩小
+            this.pgControl.width = parseInt(this.pgControl.width) - newX_lb + "px";
+            this.pgControl.height =
+              parseInt(this.pgControl.height) + newY_lb + "px";
+          } else if (angle > 110 && angle < 160) {
+            // 放大
+            this.pgControl.width = parseInt(this.pgControl.width) - newX_lb + "px";
+            this.pgControl.height =
+              parseInt(this.pgControl.height) + newY_lb + "px";
+          }
+          break;
+        case "rt":
+          const newX_rt = deltaX > 0 ? threshold : -threshold;
+          const newY_rt = deltaY < 0 ? threshold : -threshold;
+          if (angle > 110 && angle < 160) {
+            // 缩小
+            this.pgControl.width = parseInt(this.pgControl.width) + newX_rt + "px";
+            this.pgControl.height =
+              parseInt(this.pgControl.height) + newY_rt + "px";
+          } else if (angle > -70 && angle < -20) {
+            // 放大
+            this.pgControl.width = parseInt(this.pgControl.width) + newX_rt + "px";
+            this.pgControl.height =
+              parseInt(this.pgControl.height) + newY_rt + "px";
+          }
+          break;
+        case "rb":
+          const newX_rb = deltaX > 0 ? threshold : -threshold;
+          const newY_rb = deltaY > 0 ? threshold : -threshold;
+          if (angle > -160 && angle < -110) {
+            // 缩小
+            this.pgControl.width = parseInt(this.pgControl.width) + newX_rb + "px";
+            this.pgControl.height =
+              parseInt(this.pgControl.height) + newY_rb + "px";
+          } else if (angle > 20 && angle < 70) {
+            // 放大
+            this.pgControl.width = parseInt(this.pgControl.width) + newX_rb + "px";
+            this.pgControl.height =
+              parseInt(this.pgControl.height) + newY_rb + "px";
+          }
+          break;
+        default:
+          break;
       }
     },
   },
   mounted() {
     this.setCanvasSize();
     this.initControlPanEvent();
-    // this.initControlPinchEvent();
+    this.initControlPinchEvent();
     this.initControlDirPanEvent();
   },
 };
