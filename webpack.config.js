@@ -108,6 +108,12 @@ module.exports = (env) => {
       hot: true,
       // open: true,
       host: '0.0.0.0',
+      proxy: {
+        '/api': {
+          target: 'http://159.75.22.93',
+          pathRewrite: {'^/api' : ''}
+        }
+      }
     },
   };
 };

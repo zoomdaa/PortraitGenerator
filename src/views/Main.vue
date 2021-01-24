@@ -68,6 +68,7 @@ import Toast from "@/libs/Toast.js";
 import ReadFileAsImg from "@/utils/readFileAsImg";
 import Hammer from "hammerjs";
 import GetTransformInfo from "@/utils/getTransformInfo";
+import { _initWechatConfig } from "@/utils/wechat";
 
 export default {
   data() {
@@ -292,6 +293,9 @@ export default {
     this.initControlPinchEvent();
     this.initControlDirPanEvent();
   },
+  created() {
+    _initWechatConfig()
+  }
 };
 </script>
 
