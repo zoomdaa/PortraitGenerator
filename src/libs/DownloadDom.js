@@ -15,6 +15,7 @@ export default class DownloadDom {
     this.mask.appendChild(img);
     this.mask.appendChild(tips);
     this.mask.appendChild(closeBtn);
+    document.body.appendChild(this.mask);
     this.mask.style.visibility = "visible";
     this.mask.style.opacity = "1";
   }
@@ -39,19 +40,20 @@ export default class DownloadDom {
   generateImg() {
     return new Promise((resolve, reject) => {
       const { el } = this;
-      console.log(el)
+      console.log(el);
       html2canvas(el)
-        .then(canvas => {
-          console.log(canvas)
-          // const img = new Image();
-          // img.src = dataUrl;
-          // img.style.width = "80%";
-          // img.style.margin = "100px auto 50px";
-          // resolve(img);
+        .then((canvas) => {
+          const dataUrl = canvas.toDataURL();
+          console.log(dataUrl)
+          const img = new Image();
+          img.src = dataUrl;
+          img.style.width = "80%";
+          img.style.margin = "100px auto 50px";
+          resolve(img);
         })
-        .catch(error => {
-          console.log(error)
-          reject()
+        .catch((error) => {
+          console.log(error);
+          reject();
         });
     });
   }
