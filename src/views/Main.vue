@@ -65,10 +65,12 @@ import portrait_1 from "@/assets/portraits/queen_hearts.png";
 import portrait_2 from "@/assets/portraits/uncle-sam-wants-you.png";
 import portrait_3 from "@/assets/portraits/usa-new-york.png";
 import Toast from "@/libs/Toast.js";
+import DownloadDom from "@/libs/DownloadDom.js";
 import ReadFileAsImg from "@/utils/readFileAsImg";
 import Hammer from "hammerjs";
 import GetTransformInfo from "@/utils/getTransformInfo";
 import { _initWechatConfig } from "@/utils/wechat";
+import { getImgs } from "@/api/index";
 
 export default {
   data() {
@@ -133,9 +135,8 @@ export default {
       this.$refs.uploadElem.click();
     },
     downloadOnClick() {
-      new Toast({
-        msg: "哈哈哈哈",
-      });
+      const canvas = document.getElementById("pg-canvas");
+      new DownloadDom({ el: canvas });
     },
     setCanvasSize() {
       this.getImgSize(this.currentImgSrc).then(({ width, height }) => {
@@ -220,19 +221,21 @@ export default {
       // console.log(ev);
       const { controlMain } = this.$refs;
       const { angle, deltaX, deltaY } = ev;
-      let threshold = 2;
+      let threshold = 1;
       switch (pos) {
         case "lt":
           const newX_lt = deltaX > 0 ? threshold : -threshold;
           const newY_lt = deltaY > 0 ? threshold : -threshold;
           if (angle > 20 && angle < 70) {
             // 缩小
-            this.pgControl.width = parseInt(this.pgControl.width) - newX_lt + "px";
+            this.pgControl.width =
+              parseInt(this.pgControl.width) - newX_lt + "px";
             this.pgControl.height =
               parseInt(this.pgControl.height) - newY_lt + "px";
           } else if (angle > -160 && angle < -110) {
             // 放大
-            this.pgControl.width = parseInt(this.pgControl.width) - newX_lt + "px";
+            this.pgControl.width =
+              parseInt(this.pgControl.width) - newX_lt + "px";
             this.pgControl.height =
               parseInt(this.pgControl.height) - newY_lt + "px";
           }
@@ -242,12 +245,14 @@ export default {
           const newY_lb = deltaY > 0 ? threshold : -threshold;
           if (angle > -70 && angle < -20) {
             // 缩小
-            this.pgControl.width = parseInt(this.pgControl.width) - newX_lb + "px";
+            this.pgControl.width =
+              parseInt(this.pgControl.width) - newX_lb + "px";
             this.pgControl.height =
               parseInt(this.pgControl.height) + newY_lb + "px";
           } else if (angle > 110 && angle < 160) {
             // 放大
-            this.pgControl.width = parseInt(this.pgControl.width) - newX_lb + "px";
+            this.pgControl.width =
+              parseInt(this.pgControl.width) - newX_lb + "px";
             this.pgControl.height =
               parseInt(this.pgControl.height) + newY_lb + "px";
           }
@@ -257,12 +262,14 @@ export default {
           const newY_rt = deltaY < 0 ? threshold : -threshold;
           if (angle > 110 && angle < 160) {
             // 缩小
-            this.pgControl.width = parseInt(this.pgControl.width) + newX_rt + "px";
+            this.pgControl.width =
+              parseInt(this.pgControl.width) + newX_rt + "px";
             this.pgControl.height =
               parseInt(this.pgControl.height) + newY_rt + "px";
           } else if (angle > -70 && angle < -20) {
             // 放大
-            this.pgControl.width = parseInt(this.pgControl.width) + newX_rt + "px";
+            this.pgControl.width =
+              parseInt(this.pgControl.width) + newX_rt + "px";
             this.pgControl.height =
               parseInt(this.pgControl.height) + newY_rt + "px";
           }
@@ -272,12 +279,14 @@ export default {
           const newY_rb = deltaY > 0 ? threshold : -threshold;
           if (angle > -160 && angle < -110) {
             // 缩小
-            this.pgControl.width = parseInt(this.pgControl.width) + newX_rb + "px";
+            this.pgControl.width =
+              parseInt(this.pgControl.width) + newX_rb + "px";
             this.pgControl.height =
               parseInt(this.pgControl.height) + newY_rb + "px";
           } else if (angle > 20 && angle < 70) {
             // 放大
-            this.pgControl.width = parseInt(this.pgControl.width) + newX_rb + "px";
+            this.pgControl.width =
+              parseInt(this.pgControl.width) + newX_rb + "px";
             this.pgControl.height =
               parseInt(this.pgControl.height) + newY_rb + "px";
           }
@@ -294,8 +303,11 @@ export default {
     this.initControlDirPanEvent();
   },
   created() {
-    _initWechatConfig()
-  }
+    _initWechatConfig();
+    getImgs({ start: 0 }).then((res) => {
+      console.log(res);
+    });
+  },
 };
 </script>
 

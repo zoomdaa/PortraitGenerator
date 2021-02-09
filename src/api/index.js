@@ -8,3 +8,10 @@ export const getWxSign = () => {
     }
   })
 }
+
+export const getImgs = (data) => {
+  return Get({
+    url: '/wx/material',
+    data
+  })
+}
