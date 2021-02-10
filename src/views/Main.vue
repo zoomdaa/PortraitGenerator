@@ -136,7 +136,12 @@ export default {
     },
     downloadOnClick() {
       const canvas = document.getElementById("pg-canvas");
-      new DownloadDom({ el: canvas });
+      const control = document.getElementById("pg-handle-main");
+      control.style.visibility = "hidden";
+      const ddInstance =  new DownloadDom({ el: canvas });
+      ddInstance.onClose(() => {
+        control.style.visibility = "visible";
+      })
     },
     setCanvasSize() {
       this.getImgSize(this.currentImgSrc).then(({ width, height }) => {
